@@ -1,20 +1,43 @@
 #!/bin/env python3
 
 from os import mkdir
-from time import time
+from time import time, sleep
 from argparse import ArgumentParser
-from Code import Poster, AguSession
+from Code import Poster, AguSession, Database
 
 
 def main(mail: str, password: str, directory: str = None) -> None:
     agu_session = AguSession(mail, password)
     agu_session.connect()
     poster_data = agu_session.enumerate_posters()
-    posters = [Poster.hydrate(data) for data in poster_data]
     if not directory:
         directory = f"Posters_{round(time())}"
     mkdir(directory)
-    [agu_session.download_poster(p, directory) for p in posters]
+    db = Database(f"{directory}/database.csv")
+    for data in poster_data:
+        poster = Poster.hydrate(data)
+        section = poster.metadata.section
+        if not section:
+            section = 'Orphaned'
+        section_directory = f"{directory}/{section}"
+        try:
+            mkdir(section_directory)
+        except FileExistsError:
+            pass
+        # Dirty, but I am in rush and no time for clean code. To be improved.
+        try:
+            agu_session.download_poster(poster, section_directory)
+        except Exception:
+            sleep(60)
+            try:
+                agu_session.download_poster(poster, section_directory)
+            except Exception:
+                sleep(60)
+                try:
+                    agu_session.download_poster(poster, section_directory)
+                except Exception:
+                    continue
+        db.write_database(poster.get_csv_data())
     return
 
 
