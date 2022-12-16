@@ -6,6 +6,7 @@ from re import compile, search
 from Code.api.exceptions import NotLoggedException, BadPasswordException
 
 
+
 class AguSession(Session):
 
     __slots__ = ('__username', '__password')
@@ -84,6 +85,7 @@ class AguSession(Session):
             file_location = search(self.__2ND_ID_REGEXP, response.text).group()
         except AttributeError:
             return
+        print(f"[*] ({poster.metadata.section}) Downloading {poster.title}")
         response = self.get(f"https://{self.__AGU_DOMAIN}/{file_location}", stream=True, timeout=self.__TIMEOUT)
         response.raise_for_status()
         file_path = f"{directory}/{self.__sanitize_file_name(poster.title)}.pdf"
