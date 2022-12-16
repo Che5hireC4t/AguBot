@@ -52,7 +52,7 @@ class Poster(Hydratable):
 
         __UTC_TIMEZONE = timezone.utc
         __DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f0Z'
-        
+
 
         def __init__\
                 (
@@ -72,8 +72,8 @@ class Poster(Hydratable):
             else:
                 self.__session_start_time_utc = None
             return
-        
-        
+
+
 
     #   ██████╗ ██████╗  ██████╗ ██████╗ ███████╗██████╗ ████████╗██╗███████╗███████╗
     #   ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔════╝██╔══██╗╚══██╔══╝██║██╔════╝██╔════╝
@@ -109,8 +109,8 @@ class Poster(Hydratable):
 
         person_affiliation = property(fget=__get_person_affiliation, doc=f"{__get_person_affiliation.__doc__}")
     # ------------------------------------------------------------------------------------------------------------------
-    
-    
+
+
     def __init__\
             (
                 self,
@@ -194,6 +194,47 @@ class Poster(Hydratable):
             metadata_object = cls.__Metadata.hydrate(metadata_dict)
         data['metadata'] = metadata_object
         return super().hydrate(data)
+
+
+
+    def get_csv_data(self) -> dict:
+        data = \
+            {
+                'author_first_name': self.__author_first_name,
+                'chat_start_time_utc': self.__chat_start_time_utc,
+                'chat_end_time_utc': self.__chat_end_time_utc,
+                'chat_detail_id': self.__chat_detail_id,
+                'chat_sessions': self.__chat_sessions,
+                'session_start_time_utc': self.__session_start_time_utc,
+                'session_end_time_utc': self.__session_end_time_utc,
+                'video_sessions': self.__video_sessions,
+                'in_person_start_time_utc': self.__in_person_start_time_utc,
+                'in_person_end_time_utc': self.__in_person_end_time_utc,
+                'in_person_sessions': self.__in_person_sessions,
+                'id': self.__id,
+                'title': self.__title,
+                'poster_title': self.__poster_title,
+                'poster_authors': self.__poster_authors,
+                'poster_institutes': self.__poster_institutes,
+                'author': self.__author,
+                'author_surname': self.__author_surname,
+                'thumbnail': self.__thumbnail,
+                'published': self.__published,
+                'abstract_id': self.__abstract_id,
+                'display_themes': self.__display_themes,
+                'author_institutes': self.__author_institutes,
+                'notice': self.__notice,
+                'award_icon_name': self.__award_icon_name,
+                'section': self.__metadata.section,
+                'person_affiliation': self.__metadata.person_affiliation,
+                'final_paper_number': self.__metadata.final_paper_number,
+                'author_title_prefix': self.__author_title_prefix,
+                'theme': self.__theme,
+                'presenter': self.__presenter,
+                'day': self.__day,
+                'time': self.__time
+            }
+        return data
 
 
 
