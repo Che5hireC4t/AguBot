@@ -436,3 +436,38 @@ class Poster(Hydratable):
 
     time = property(fget=__get_time, doc=f"{__get_time.__doc__}")
 # ----------------------------------------------------------------------------------------------------------------------
+
+    def __get_file_name(self) -> str:
+        file_name = self.__title.replace(' ', '_')
+        file_name = file_name.replace('(', '')
+        file_name = file_name.replace(')', '')
+        file_name = file_name.replace('[', '')
+        file_name = file_name.replace(']', '')
+        file_name = file_name.replace('{', '')
+        file_name = file_name.replace('}', '')
+        file_name = file_name.replace('<', '')
+        file_name = file_name.replace('>', '')
+        file_name = file_name.replace('/', '')
+        file_name = file_name.replace('\\', '')
+        file_name = file_name.replace('"', '')
+        file_name = file_name.replace("'", '')
+        file_name = file_name.replace(',', '')
+        file_name = file_name.replace('.', '')
+        file_name = file_name.replace(';', '')
+        file_name = file_name.replace(':', '')
+        file_name = file_name.replace('!', '')
+        file_name = file_name.replace('?', '')
+        file_name = file_name.replace('%', '')
+        file_name = file_name.replace('#', '')
+        file_name = file_name.replace('+', '')
+        file_name = file_name.replace('=', '')
+        file_name = file_name.replace('°', '')
+        file_name = file_name.replace('~', '')
+        file_name = file_name.replace('^', '')
+        file_name = file_name.replace('*', '')
+        file_name = file_name.replace('__', '_')
+        file_name = f"{file_name}.pdf"
+        return file_name.lower()
+
+    file_name = property(fget=__get_file_name, doc=f"{__get_file_name.__doc__}")
+# ----------------------------------------------------------------------------------------------------------------------
