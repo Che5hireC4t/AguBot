@@ -78,54 +78,20 @@ class AguSession(Session):
 
 
 
-    def download_poster(self, poster, directory: str = '') -> None:
+    def download_poster(self, file_path: str = '') -> None:
+        print(f"[*] ({poster.metadata.section}) Downloading {poster.title}")
         response = self.get(f"https://{self.__AGU_DOMAIN}/?s={poster.id}", timeout=self.__TIMEOUT)
         response.raise_for_status()
         try:
             file_location = search(self.__2ND_ID_REGEXP, response.text).group()
         except AttributeError:
             return
-        print(f"[*] ({poster.metadata.section}) Downloading {poster.title}")
         response = self.get(f"https://{self.__AGU_DOMAIN}/{file_location}", stream=True, timeout=self.__TIMEOUT)
         response.raise_for_status()
-        file_path = f"{directory}/{self.__sanitize_file_name(poster.title)}.pdf"
         with open(file_path, 'wb') as file_descriptor:
             for chunk in response.iter_content(chunk_size=1024 * 1024):
                 file_descriptor.write(chunk)
         return
-
-
-    @staticmethod
-    def __sanitize_file_name(raw_file_name: str) -> str:
-        file_name = raw_file_name.replace(' ', '_')
-        file_name = file_name.replace('(', '')
-        file_name = file_name.replace(')', '')
-        file_name = file_name.replace('[', '')
-        file_name = file_name.replace(']', '')
-        file_name = file_name.replace('{', '')
-        file_name = file_name.replace('}', '')
-        file_name = file_name.replace('<', '')
-        file_name = file_name.replace('>', '')
-        file_name = file_name.replace('/', '')
-        file_name = file_name.replace('\\', '')
-        file_name = file_name.replace('"', '')
-        file_name = file_name.replace("'", '')
-        file_name = file_name.replace(',', '')
-        file_name = file_name.replace('.', '')
-        file_name = file_name.replace(';', '')
-        file_name = file_name.replace(':', '')
-        file_name = file_name.replace('!', '')
-        file_name = file_name.replace('?', '')
-        file_name = file_name.replace('%', '')
-        file_name = file_name.replace('#', '')
-        file_name = file_name.replace('+', '')
-        file_name = file_name.replace('=', '')
-        file_name = file_name.replace('°', '')
-        file_name = file_name.replace('~', '')
-        file_name = file_name.replace('^', '')
-        file_name = file_name.replace('*', '')
-        file_name = file_name.replace('__', '_')
-        return file_name.lower()
 
 
 
@@ -135,6 +101,7 @@ class AguSession(Session):
         if login_form['callbacks'][0]['output'][0]['value'] == 'Incorrect Password':
             raise BadPasswordException(self.__password, 'Password is incorrect.')
         return
+    
 
 
     def __query_login_api(self, data=None) -> dict:
