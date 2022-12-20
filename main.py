@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 from os import mkdir
+from os.path import exists
 from time import time, sleep
 from argparse import ArgumentParser
 from Code import Poster, AguSession, Database
@@ -12,7 +13,10 @@ def main(mail: str, password: str, directory: str = None) -> None:
     poster_data = agu_session.enumerate_posters()
     if not directory:
         directory = f"Posters_{round(time())}"
-    mkdir(directory)
+    try:
+        mkdir(directory)
+    except FileExistsError:
+        pass
     db = Database(f"{directory}/database.csv")
     for data in poster_data:
         poster = Poster.hydrate(data)
@@ -24,15 +28,19 @@ def main(mail: str, password: str, directory: str = None) -> None:
             mkdir(section_directory)
         except FileExistsError:
             pass
+        poster_path = f"{section_directory}/{poster.file_name}"
+        if exists(poster_path):
+            print(f"[*] ({poster.metadata.section}) {poster.title} already downloaded.")
+            continue
         # Dirty, but I am in rush and no time for clean code. To be improved.
         try:
-            agu_session.download_poster(poster, section_directory)
+            agu_session.download_poster(poster_path)
         except Exception:
-            sleep(60)
+            sleep(30)
             try:
                 agu_session.download_poster(poster, section_directory)
             except Exception:
-                sleep(60)
+                sleep(30)
                 try:
                     agu_session.download_poster(poster, section_directory)
                 except Exception:
