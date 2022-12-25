@@ -20,8 +20,11 @@ def main(mail: str, password: str, directory: str = None) -> None:
     db = Database(f"{directory}/database.csv")
     for data in poster_data:
         poster = Poster.hydrate(data)
-        section = poster.metadata.section
-        if not section:
+        try:
+            section = poster.metadata.section
+            if not section:
+                section = 'Orphaned'
+        except AttributeError:
             section = 'Orphaned'
         section_directory = f"{directory}/{section}"
         try:
@@ -30,11 +33,11 @@ def main(mail: str, password: str, directory: str = None) -> None:
             pass
         poster_path = f"{section_directory}/{poster.file_name}"
         if exists(poster_path):
-            print(f"[*] ({poster.metadata.section}) {poster.title} already downloaded.")
+            print(f"[*] ({section}) {poster.title} already downloaded.")
             continue
         poster_id = poster.id
         # Dirty, but I am in rush and no time for clean code. To be improved.
-        print(f"[*] ({poster.metadata.section}) Downloading {poster.title}")
+        print(f"[*] ({section}) Downloading {poster.title}")
         try:
             agu_session.download_poster(poster_id, poster_path)
         except Exception:
