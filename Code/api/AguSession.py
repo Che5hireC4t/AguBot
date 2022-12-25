@@ -8,6 +8,22 @@ from Code.api.exceptions import NotLoggedException, BadPasswordException
 
 
 class AguSession(Session):
+    """
+    This class inherits from requests.Session.
+    It represents the session of a user connected to the AGU API.
+
+
+
+    ███████╗ ██╗      ██████╗ ████████╗███████╗
+    ██╔════╝ ██║     ██╔═══██╗╚══██╔══╝██╔════╝
+    ███████╗ ██║     ██║   ██║   ██║   ███████╗
+    ╚════██║ ██║     ██║   ██║   ██║   ╚════██║
+    ███████║ ███████╗╚██████╔╝   ██║   ███████║
+    ╚══════╝ ╚══════╝ ╚═════╝    ╚═╝   ╚══════╝
+
+    @param      __username      str     The username (generally the mail address) used for that account.
+    @param      __password      str     The password used for that account.
+    """
 
     __slots__ = ('__username', '__password')
 
@@ -40,7 +56,15 @@ class AguSession(Session):
             'querydata': '{ "sortby" : "default", "metasearch" : { "coauthors" : "", "person_affiliation" : "" } }'
         }
 
+
+
     def __init__(self, username: str, password: str) -> None:
+        """
+        @username       str     The username (generally the mail address) used for that account.
+        @password       str     The password used for that account
+
+        @return         None
+        """
         super().__init__()
         self.__username = str(username)
         self.__password = str(password)
@@ -52,6 +76,13 @@ class AguSession(Session):
 
 
     def connect(self) -> None:
+        """
+        @return:    None
+
+        Function used to log in the user to his AGU account,
+        using the instance variables self.__username and self.__password
+        setup in __init__
+        """
         login_form = self.__query_login_api()
         login_form['callbacks'][0]['input'][0]['value'] = self.__username
         login_form = self.__query_login_api(login_form)
@@ -61,7 +92,14 @@ class AguSession(Session):
         return
 
 
+
     def enumerate_posters(self) -> tuple:
+        """
+        @return:    tuple   All the poster metadata extracted from the API
+
+        This function query the API and returns all the metadata of poster on
+        the form of a tuple of dictionary, describing the title, the author, etc...
+        """
         headers = self.headers.copy()
         headers['Accept'] = 'application/json, text/javascript, */*; q=0.01'
         headers['content-type'] = 'application/json; charset=utf-8'
@@ -79,7 +117,15 @@ class AguSession(Session):
 
 
     def download_poster(self, poster_id: int, file_path: str = '') -> None:
+        """
+        @poster_id      int     The id of the poster to download
+        @file_path      str     Where to write the .pdf poster file locally
 
+        @return         None
+
+        This function downloads the poster identified by the id @poster_id and
+        write it at @file_path
+        """
         response = self.get(f"https://{self.__AGU_DOMAIN}/?s={poster_id}", timeout=self.__TIMEOUT)
         response.raise_for_status()
         try:
@@ -96,6 +142,17 @@ class AguSession(Session):
 
 
     def __raise_for_incorrect_password(self, login_form: dict) -> None:
+        """
+        @login_form     dict                    The json response sent back by the server after a connection attempt
+
+        @return         None
+
+        @raise          BadPasswordException    Raised if the provided password is incorrect.
+
+        This method is called by self.connect. It checks the response sent back by the server
+        after a connection attempt in order to find evidences of bad credentials. If everything
+        is ok, then return. Else, raise a BadPasswordException exception.
+        """
         if 'tokenId' in login_form:
             return
         if login_form['callbacks'][0]['output'][0]['value'] == 'Incorrect Password':
@@ -104,7 +161,16 @@ class AguSession(Session):
     
 
 
-    def __query_login_api(self, data=None) -> dict:
+    def __query_login_api(self, data: dict = None) -> dict:
+        """
+        @data       dict        json data to send to the AGU API
+
+        @return     dict        json response data sent back by the API.
+
+        @raise      HttpError   If a 400-500 error occurs
+
+        Internal method used to query the API with arbitrary data, and return the response.
+        """
         if not data:
             data = dict()
         else:
