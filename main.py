@@ -32,17 +32,19 @@ def main(mail: str, password: str, directory: str = None) -> None:
         if exists(poster_path):
             print(f"[*] ({poster.metadata.section}) {poster.title} already downloaded.")
             continue
+        poster_id = poster.id
         # Dirty, but I am in rush and no time for clean code. To be improved.
+        print(f"[*] ({poster.metadata.section}) Downloading {poster.title}")
         try:
-            agu_session.download_poster(poster_path)
+            agu_session.download_poster(poster_id, poster_path)
         except Exception:
             sleep(30)
             try:
-                agu_session.download_poster(poster, section_directory)
+                agu_session.download_poster(poster_id, poster_path)
             except Exception:
                 sleep(30)
                 try:
-                    agu_session.download_poster(poster, section_directory)
+                    agu_session.download_poster(poster_id, poster_path)
                 except Exception:
                     continue
         db.write_database(poster.get_csv_data())

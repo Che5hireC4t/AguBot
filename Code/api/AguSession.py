@@ -78,9 +78,9 @@ class AguSession(Session):
 
 
 
-    def download_poster(self, file_path: str = '') -> None:
-        print(f"[*] ({poster.metadata.section}) Downloading {poster.title}")
-        response = self.get(f"https://{self.__AGU_DOMAIN}/?s={poster.id}", timeout=self.__TIMEOUT)
+    def download_poster(self, poster_id: int, file_path: str = '') -> None:
+
+        response = self.get(f"https://{self.__AGU_DOMAIN}/?s={poster_id}", timeout=self.__TIMEOUT)
         response.raise_for_status()
         try:
             file_location = search(self.__2ND_ID_REGEXP, response.text).group()
