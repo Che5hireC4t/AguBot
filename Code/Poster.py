@@ -198,6 +198,14 @@ class Poster(Hydratable):
 
 
     def get_csv_data(self) -> dict:
+        try:
+            section = self.__metadata.section
+            person_affiliation = self.__metadata.person_affiliation
+            final_paper_number = self.__metadata.final_paper_number
+        except AttributeError:
+            section = ''
+            person_affiliation = ''
+            final_paper_number = ''
         data = \
             {
                 'author_first_name': self.__author_first_name,
@@ -225,9 +233,9 @@ class Poster(Hydratable):
                 'author_institutes': self.__author_institutes,
                 'notice': self.__notice,
                 'award_icon_name': self.__award_icon_name,
-                'section': self.__metadata.section,
-                'person_affiliation': self.__metadata.person_affiliation,
-                'final_paper_number': self.__metadata.final_paper_number,
+                'section': section,
+                'person_affiliation': person_affiliation,
+                'final_paper_number': final_paper_number,
                 'author_title_prefix': self.__author_title_prefix,
                 'theme': self.__theme,
                 'presenter': self.__presenter,
